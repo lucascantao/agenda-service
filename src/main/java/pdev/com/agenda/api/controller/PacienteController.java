@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import pdev.com.agenda.api.mapper.PacienteMapper;
+import pdev.com.agenda.api.request.PacienteRequest;
+import pdev.com.agenda.api.response.PacienteResponse;
 import pdev.com.agenda.domain.entity.Paciente;
 import pdev.com.agenda.domain.service.PacienteService;
 
@@ -25,36 +29,41 @@ public class PacienteController {
     
 
     private final PacienteService service;
+    private final PacienteMapper mapper;
 
     @PostMapping
-    public ResponseEntity<Paciente> salvar(@RequestBody Paciente paciente){
-
+    public ResponseEntity<PacienteResponse> salvar(@Valid @RequestBody PacienteRequest request){
+        Paciente paciente = mapper.toPaciente(request);
         Paciente pacienteSalvo = service.salvar(paciente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteSalvo);
+        PacienteResponse response = mapper.toPacienteResponse(pacienteSalvo);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
     }
     
     @GetMapping
-    public ResponseEntity<List<Paciente>> listarTodos() {
+    public ResponseEntity<List<PacienteResponse>> listarTodos() {
         List<Paciente> pacientes = service.listarTodos();
-        return ResponseEntity.status((HttpStatus.OK)).body(pacientes);
+        List<PacienteResponse> responses = mapper.toPacienteResponseList(pacientes);
+        return ResponseEntity.status((HttpStatus.OK)).body(responses);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> listarPorId(@PathVariable Long id) {
-        Optional<Paciente> optPacientes = service.buscarPorId(id);
+    public ResponseEntity<PacienteResponse> listarPorId(@PathVariable Long id) {
+        Optional<Paciente> optPaciente = service.buscarPorId(id);
 
-        if(optPacientes.isEmpty()) {
+        if(optPaciente.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.status((HttpStatus.OK)).body(optPacientes.get());
+        PacienteResponse response = mapper.toPacienteResponse(optPaciente.get());
+        return ResponseEntity.status((HttpStatus.OK)).body(response);
     }
 
-    @PutMapping
-    public ResponseEntity<Paciente> alterar(@RequestBody Paciente paciente){
-        Paciente p = service.salvar(paciente);
-        return ResponseEntity.status(HttpStatus.OK).body(p);
+    @PutMapping("/{id}")
+    public ResponseEntity<PacienteResponse> alterar(@PathVariable Long id, @RequestBody PacienteRequest request){
+        Paciente paciente = mapper.toPaciente(request);
+        PacienteResponse response = mapper.toPacienteResponse(service.alterar(id, paciente));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{id}")

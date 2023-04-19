@@ -40,6 +40,18 @@ public class PacienteService {
         return repository.save(paciente);
     }
 
+    public Paciente alterar(Long id, Paciente paciente) {
+
+        if(this.buscarPorId(id).isEmpty()){
+            throw new BusinessException("Paciente não existente");
+        }
+        
+        paciente.setId(id);
+        
+        return repository.save(paciente);
+        
+    }
+
     public List<Paciente> listarTodos() {
         return repository.findAll();
         
