@@ -1,6 +1,5 @@
 package pdev.com.agenda.api.mapper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,15 +30,5 @@ public class PacienteMapper {
         .map(this::toPacienteResponse)
         .collect(Collectors.toList());
     }
-
-    // public static List<PacienteResponse> toPacienteResponseList(List<Paciente> pacientes){
-    //     List<PacienteResponse> responses = new ArrayList<>();
-
-    //     for (Paciente paciente : pacientes){
-    //         responses.add(toPacienteResponse(paciente));
-    //     }
-
-    //     return responses;
-    // }
 
 }
